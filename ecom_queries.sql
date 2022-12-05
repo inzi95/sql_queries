@@ -51,3 +51,21 @@ ON
   top_products.product_id = p.id
 WHERE
   top_products.number_of_orders > 10
+  
+-- Ranking the top product IDS using rank function
+WITH
+  temp_table AS (
+  SELECT
+    oi.product_id,
+    COUNT(product_id) AS number_of_orders,
+  FROM
+    `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+  GROUP BY
+    oi.product_id)
+SELECT
+  *,
+  RANK() OVER(ORDER BY temp_table.number_of_orders DESC) AS rank
+FROM
+  temp_table
+ORDER BY
+  rank asc
